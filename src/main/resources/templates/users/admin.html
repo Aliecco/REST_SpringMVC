@@ -25,8 +25,8 @@
     <div class="navbar-header navbar-brand">
         <strong><a th:text="${user.getEmail()}"></a></strong>
         <span class="text-start">with roles:
-                <a th:each="role : ${user.getRoles()}" th:text="${role} + ' '"></a>
-            </span>
+            <a th:each="role : ${user.getRoles()}" th:text="${role} + ' '"></a>
+        </span>
     </div>
     <div>
         <ul class="navbar-nav text-right">
@@ -65,7 +65,8 @@
                     </div>
                 </nav>
                 <div class="container border tab-content" id="nav-tabContent">
-                    <!--Таблица-->
+
+                    <!--Таблица всех пользователей-->
                     <div class="tab-pane fade show active" id="nav-users" role="tabpanel"
                          aria-labelledby="nav-users-tab">
                         <br>
@@ -85,29 +86,8 @@
                                 <th scope="col">Delete</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <tr th:each="user : ${users}">
-                                <th scope="row" th:text="${user.getId()}"></th>
-                                <td>
-                                    <a th:href="@{/admin/{id}(id=${user.getId()})}" th:text="${user.getFirstName()}">VALUE</a>
-                                </td>
-                                <td th:text="${user.getLastName()}"></td>
-                                <td th:text="${user.getAge()}"></td>
-                                <td th:text="${user.getEmail()}"></td>
-                                <td th:text="${user.getRoles()}"></td>
-                                <td>
-                                    <!-- Button trigger modal -->
-                                    <button th:href="${'#edit' + user.getId()}" type="button" class="btn btn-info"
-                                            data-toggle="modal">Edit
-                                    </button>
-                                </td>
-                                <td>
-                                    <!-- Button trigger modal -->
-                                    <button th:href="${'#delete' + user.getId()}" type="button" class="btn btn-danger"
-                                            data-toggle="modal">Delete
-                                    </button>
-                                </td>
-                            </tr>
+                            <!--скрипт-->
+                            <tbody><tr class="user-table"></tr>
                             </tbody>
                         </table>
                     </div>
@@ -226,6 +206,7 @@
     </div>
 </div>
 
+
 <!--Edit window-->
 <div class="modal fade" th:each="user : ${users}" th:id="${'edit' + user.getId()}"
      tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
@@ -244,7 +225,7 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>First name</strong>
-                                    <input type="text" name="firstName" id="editFirstName"
+                                    <input type="text" name="firstName"
                                            class="form-control" th:value="${user.firstName}"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
@@ -253,7 +234,7 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Last name</strong>
-                                    <input type="text" name="lastName" id="editLastName"
+                                    <input type="text" name="lastName"
                                            class="form-control" th:value="${user.lastName}"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
@@ -262,7 +243,7 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Age</strong>
-                                    <input type="number" name="age" id="editAge"
+                                    <input type="number" name="age"
                                            class="form-control" th:value="${user.age}"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
@@ -271,7 +252,7 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Email</strong>
-                                    <input type="text" name="email" id="editEmail"
+                                    <input type="text" name="email"
                                            class="form-control" th:value="${user.email}"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
@@ -280,7 +261,7 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Password</strong>
-                                    <input type="password" name="password" id="editPassword"
+                                    <input type="password" name="password"
                                            class="form-control"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
@@ -288,8 +269,8 @@
                         </div>
                         <div class="d-flex flex-row bd-highlight">
                             <div class="form-group">
-                                <label for="editRole"><strong>Roles</strong></label>
-                                <select id="editRole" class="custom-select bd-primary"
+                                <label><strong>Roles</strong></label>
+                                <select class="custom-select bd-primary"
                                         size="2" name="roles" multiple="multiple">
                                     <option th:each="role : ${roles}"
                                             th:value="${role.getRole}"
@@ -378,5 +359,9 @@
         </div>
     </div>
 </div>
+
+<script src="./script.js"></script>
 </body>
+
+
 </html>
