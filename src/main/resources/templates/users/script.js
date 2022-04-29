@@ -1,13 +1,12 @@
 
-const usersTable = document.querySelector('.user-list');
+const usersTable = document.querySelector('.user-table');
 const url = 'http://localhost:8080/api/users';
 let output = '';
 
 let renderUsers = (users) => {
     users.forEach(user => {
-        output += `
-                    <tr>
-                        <th scope="row">${user.getId()}</th>
+        output += `<tr>
+                        <th scope="row">${user.getId}</th>
                         <td>${user.getFirstName()}</td>
                         <td>${user.getLastName()}</td>
                         <td>${user.getAge()}</td>
@@ -21,13 +20,11 @@ let renderUsers = (users) => {
                             <button th:href="${'#delete' + user.getId()}" type="button" class="btn btn-danger"
                                  data-toggle="modal" value="${user.id}">Delete</button>
                         </td>
-                    </tr>
-                `;
+                    </tr>`;
     });
     usersTable.innerHTML = output;
 }
-
 //вывод таблицы всех пользователей
-fetch(url)
+fetch('http://localhost:8080/api/users')
     .then(res => res.json())
     .then(data => renderUsers(data));

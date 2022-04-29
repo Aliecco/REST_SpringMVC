@@ -17,6 +17,10 @@
             integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
             crossorigin="anonymous"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+            integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+            crossorigin="anonymous"></script>
+
     <title>Admin panel</title>
 </head>
 <body>
@@ -87,7 +91,7 @@
                             </tr>
                             </thead>
                             <!--скрипт-->
-                            <tbody><tr class="user-table"></tr>
+                            <tbody class="user-table">
                             </tbody>
                         </table>
                     </div>
@@ -100,64 +104,62 @@
                         </div>
 
                         <div class="bg-white">
-                            <form class="container-fluid text-center col-2" th:action="@{/admin/new}"
-                                  th:method="post" th:object="${user}">
+                            <form class="container-fluid text-center col-2" >
                                 <div class="row d-flex justify-content-center">
                                     <div class="row">
                                         <div class="input-group">
                                             <label><strong>First name</strong>
-                                                <input type="text" name="firstName" id="firstName"
-                                                       class="form-control">
+                                                <input type="text" name="firstName"
+                                                       class="form-control" id="addFirstName">
                                             </label>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="input-group">
                                             <label><strong>Last name</strong>
-                                                <input type="text" name="lastName" id="lastName"
-                                                       class="form-control">
+                                                <input type="text" name="lastName"
+                                                       class="form-control" id="addLastName">
                                             </label>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="input-group">
                                             <label><strong>Age</strong>
-                                                <input type="number" name="age" id="age"
-                                                       class="form-control">
+                                                <input type="number" name="age" class="form-control"
+                                                       id="addAge">
                                             </label>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="input-group">
                                             <label><strong>Email</strong>
-                                                <input type="text" name="email" id="email" class="form-control">
+                                                <input type="text" name="email" class="form-control"
+                                                       id="addEmail">
                                             </label>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="input-group">
                                             <label><strong>Password</strong>
-                                                <input type="password" name="password" id="password"
-                                                       class="form-control">
+                                                <input type="password" name="password" class="form-control"
+                                                       id="addPassword">
                                             </label>
                                         </div>
                                     </div>
                                     <div class="d-flex flex-row bd-highlight">
                                         <div class="form-group">
-                                            <label for="newRole"><strong>Roles</strong></label>
-                                            <select id="newRole" class="custom-select bd-primary"
+                                            <label for="addRole"><strong>Roles</strong></label>
+                                            <select id="addRole" class="custom-select bd-primary"
                                                     size="2" name="roles" multiple="multiple">
-                                                <option th:each="role : ${roles}"
-                                                        th:value="${role.getRole()}"
-                                                        th:text="${#strings.replace(role.getRole(), 'ROLE_', '')}"
-                                                        th:selected="${role.getRole()} == USER">
-                                                </option>
+                                                <option value="ROLE_ADMIN">ADMIN</option>
+                                                <option active=true value="ROLE_USER">USER</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="d-flex flex-row bd-highlight">
                                         <div class="form-group">
-                                            <button type="submit" class="btn btn-success">Add new user</button>
+                                            <button type="submit" class="btn btn-success"
+                                            onclick="addUser()">Add new user</button>
                                         </div>
                                     </div>
                                 </div>
@@ -191,12 +193,12 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td th:utext="${user.getId()}">VALUE</td>
-                            <td th:text="${user.getFirstName()}">VALUE</td>
-                            <td th:text="${user.getLastName()}">VALUE</td>
-                            <td th:utext="${user.getEmail()}">VALUE</td>
-                            <td th:utext="${user.getAge()}">VALUE</td>
-                            <td th:text="${user.getRoles()}">Value</td>
+                            <td th:text="${user.getId()}"></td>
+                            <td th:text="${user.getFirstName()}"></td>
+                            <td th:text="${user.getLastName()}"></td>
+                            <td th:text="${user.getEmail()}"></td>
+                            <td th:text="${user.getAge()}"></td>
+                            <td th:text="${user.getRoles()}"></td>
                         </tr>
                         </tbody>
                     </table>
@@ -360,8 +362,86 @@
     </div>
 </div>
 
-<script src="./script.js"></script>
 </body>
 
+<script>
+    const usersTable = document.querySelector('.user-table');
+    const url = 'http://localhost:8080/api/users';
+    let output = '';
+
+
+    let renderUsers = (users) => {
+        users.forEach(user => {
+            let roleOfUser = '';
+            for (let a of user.roles) {
+                roleOfUser += a.role.replace("ROLE_", "") + " ";
+            }
+            output += `<tr>
+                        <th scope="row">${user.id}</th>
+                        <td>${user.firstName}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.age}</td>
+                        <td>${user.email}</td>
+                        <td>${roleOfUser}</td>
+                        <td>
+                            <button th:href="${'#edit' + user.id}" type="button" class="btn btn-info"
+                                data-toggle="modal" value="${user.id}">Edit</button>
+                        </td>
+                        <td>
+                            <button th:href="${'#delete' + user.id}" type="button" class="btn btn-danger"
+                                 data-toggle="modal" value="${user.id}">Delete</button>
+                        </td>
+                    </tr>`;
+        });
+        usersTable.innerHTML = output;
+    }
+    //вывод таблицы всех пользователей
+    function getUsers () {
+        fetch(url)
+        .then(res => res.json())
+        .then(data => renderUsers(data));
+    }
+
+    getUsers();
+
+    function clearUsers () {
+        usersTable.innerHTML = '';
+        getUsers();
+    }
+
+    function addUser () {
+        let roles = [];
+        $('#roles').val().forEach(roleName => {
+            roles.push({role: roleName});
+        })
+        let user = {
+            firstName: $("#addFirstName").val().trim(),
+            lastName: $("#addFirstName").val().trim(),
+            email: $("#addEmail").val().trim(),
+            age: $("#addAge").val().trim(),
+            password: $("#addPassword").val().trim(),
+            roles: roles
+        }
+
+        fetch(url, {
+            method:'POST',
+            headers: {
+                'Accept': 'application/json',
+                "Content-Type": 'application/json',
+                'Referer': null
+            },
+            body: JSON.stringify(user)
+        })
+
+        clearUsers();
+    }
+
+    // createUser: async (user) => await fetch(URLUserAPI, {
+    //     method: 'POST',
+    //     headers: userFetchService.head,
+    //     body: JSON.stringify(user)
+    // })
+
+</script>
 
 </html>
