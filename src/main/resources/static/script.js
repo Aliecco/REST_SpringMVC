@@ -18,6 +18,9 @@ let renderUsers = (users) => {
         for (let a of user.roles) {
             roleOfUser += a.role.replace("ROLE_", "") + " ";
         }
+        // TODO добавить уникальный айди к каждой кнопкеid="unique"
+        // TODO почитать про addEventListener
+        // TODO как вызвать модальное окно через jQuery
         output += `<tr>
                         <th scope="row">${user.id}</th>
                         <td>${user.firstName}</td>
@@ -26,9 +29,6 @@ let renderUsers = (users) => {
                         <td>${user.email}</td>
                         <td>${roleOfUser}</td>
                         <td>
-                            <!--TODO добавить уникальный айди к каждой кнопкеid="unique",-->
-<!--                            TODO почитать про addEventListener-->
-<!--                            TODO как вызвать модальное окно через jQuery-->
                             <button th:href="${'#edit' + user.id}" type="button" class="btn btn-info"
                                 data-toggle="modal" value="${user.id}">Edit</button>
                         </td>
@@ -59,9 +59,13 @@ function clearUsers () {
 
 function addUser () {
     console.log('addUser started')
-    let roles = allRoles();
+    let roles = [];
 
-
+    let authorities = $('#addRole').val();
+    authorities.forEach(roleId => {
+        roles.push({id: roleId, role: roleId == 1 ? "ROLE_USER" : "ROLE_ADMIN"
+        //roles = allRoles(by id)
+            })})
     console.log(roles);
 
     let user = {
@@ -87,7 +91,29 @@ function addUser () {
     })
         .then(data => {
             console.log('Success:', data);
-            clearUsers();
+            // clearUsers();
+            let roleOfUser = '';
+            for (let a of user.roles) {
+                roleOfUser += a.role.replace("ROLE_", "") + " ";
+            }
+            output += `<tr>
+                        <th scope="row">${user.id}</th>
+                        <td>${user.firstName}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.age}</td>
+                        <td>${user.email}</td>
+                        <td>${roleOfUser}</td>
+                        <td>
+                            <button th:href="${'#edit' + user.id}" type="button" class="btn btn-info"
+                                data-toggle="modal" value="${user.id}">Edit</button>
+                        </td>
+                        <td>
+
+                            <button th:href="${'#delete' + user.id}" type="button" class="btn btn-danger"
+                                 data-toggle="modal" value="${user.id}">Delete</button>
+                        </td>
+                    </tr>`;
+            usersTable.innerHTML = output;
         })
         .catch((error) => {
             console.error('Error:', error);
