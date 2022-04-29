@@ -104,7 +104,7 @@
                         </div>
 
                         <div class="bg-white">
-                            <form class="container-fluid text-center col-2" >
+<!--                            <form class="container-fluid text-center col-2" >-->
                                 <div class="row d-flex justify-content-center">
                                     <div class="row">
                                         <div class="input-group">
@@ -163,7 +163,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </form>
+<!--                            </form>-->
                         </div>
 
                     </div>
@@ -411,9 +411,15 @@
 
     function addUser () {
         let roles = [];
-        $('#roles').val().forEach(roleName => {
-            roles.push({role: roleName});
-        })
+
+        $('#roles option:selected').each(function(){
+            roles.push({role: $(this).val()});
+        });
+
+        // $('#roles').val().each(roleName => {
+        //     roles.push({role: roleName});
+        // })
+        
         let user = {
             firstName: $("#addFirstName").val().trim(),
             lastName: $("#addFirstName").val().trim(),
@@ -435,12 +441,6 @@
 
         clearUsers();
     }
-
-    // createUser: async (user) => await fetch(URLUserAPI, {
-    //     method: 'POST',
-    //     headers: userFetchService.head,
-    //     body: JSON.stringify(user)
-    // })
 
 </script>
 
