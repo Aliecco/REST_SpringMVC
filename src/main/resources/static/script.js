@@ -1,6 +1,6 @@
+
 const usersTable = document.querySelector('.user-table');
 const url = 'http://localhost:8080/api/users';
-let output = '';
 
 
 let allRoles = () => {
@@ -13,12 +13,14 @@ let allRoles = () => {
 allRoles();
 
 let renderUsers = (users) => {
+    let output = '';
     users.forEach(user => {
+
         let roleOfUser = '';
         for (let a of user.roles) {
             roleOfUser += a.role.replace("ROLE_", "") + " ";
         }
-        // TODO добавить уникальный айди к каждой кнопкеid="unique"
+        // TODO добавить уникальный айди к каждой кнопке id="unique"
         // TODO почитать про addEventListener
         // TODO как вызвать модальное окно через jQuery
         output += `<tr>
@@ -29,13 +31,13 @@ let renderUsers = (users) => {
                         <td>${user.email}</td>
                         <td>${roleOfUser}</td>
                         <td>
-                            <button th:href="${'#edit' + user.id}" type="button" class="btn btn-info"
-                                data-toggle="modal" value="${user.id}">Edit</button>
+                            <button onclick="$('${'#edit'+user.id}').modal('show')" type="button" 
+                            class="btn btn-info" data-toggle="modal" value="${user.id}">Edit</button>
                         </td>
                         <td>
-
-                            <button th:href="${'#delete' + user.id}" type="button" class="btn btn-danger"
-                                 data-toggle="modal" value="${user.id}">Delete</button>
+                            <button type="button" class="btn btn-danger"
+                                 data-toggle="modal" onclick="$('${'#delete'+user.id}').modal('show')" 
+                                 value="${user.id}">Delete</button>
                         </td>
                     </tr>`;
     });
@@ -52,7 +54,8 @@ function getUsers () {
 getUsers();
 
 function clearUsers () {
-    $("#usersList").html("");
+    $('.user-table').html("");
+    // usersTable.
     console.log('CLEAR TABLE')
     getUsers();
 }
@@ -91,32 +94,52 @@ function addUser () {
     })
         .then(data => {
             console.log('Success:', data);
-            // clearUsers();
-            let roleOfUser = '';
-            for (let a of user.roles) {
-                roleOfUser += a.role.replace("ROLE_", "") + " ";
-            }
-            output += `<tr>
-                        <th scope="row">${user.id}</th>
-                        <td>${user.firstName}</td>
-                        <td>${user.lastName}</td>
-                        <td>${user.age}</td>
-                        <td>${user.email}</td>
-                        <td>${roleOfUser}</td>
-                        <td>
-                            <button th:href="${'#edit' + user.id}" type="button" class="btn btn-info"
-                                data-toggle="modal" value="${user.id}">Edit</button>
-                        </td>
-                        <td>
-
-                            <button th:href="${'#delete' + user.id}" type="button" class="btn btn-danger"
-                                 data-toggle="modal" value="${user.id}">Delete</button>
-                        </td>
-                    </tr>`;
-            usersTable.innerHTML = output;
+            clearUsers();
         })
         .catch((error) => {
             console.error('Error:', error);
         });
 
+
+}
+
+function deleteButton (id) {
+    fetch(url+'/'+id, {
+        method:'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            "Content-Type": 'application/json',
+            'Referer': null
+        }
+    })
+        .then(data => {
+            console.log('Success:', data);
+            $('#delete'+id).modal('hide')
+            clearUsers();
+
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
+}
+function editUser (id) {
+
+    fetch(url+id, {
+        method:'PUT',
+        headers: {
+            'Accept': 'application/json',
+            "Content-Type": 'application/json',
+            'Referer': null
+        }
+    })
+        .then(data => {
+            console.log('Success:', data);
+            $('#delete'+id).modal('hide')
+            clearUsers();
+
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 }

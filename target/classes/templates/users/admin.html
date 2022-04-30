@@ -212,8 +212,10 @@
 <div class="modal fade" th:each="user : ${users}" th:id="${'edit' + user.getId()}"
      tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <form role="form" class="form-horizontal" th:method="POST" th:action="@{/admin/{id}/edit(id=${user.getId()})}"
-              th:object="${user}">
+        <form role="form" class="form-horizontal">
+<!--              th:method="PUT"-->
+<!--              th:action="@{/api/users}" th:object="${user}"-->
+
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="ModalLongTitle">Edit user</h5>
@@ -285,7 +287,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary"
+                            th:onclick="@{console.log({user})" >Save changes</button>
                 </div>
             </div>
         </form>
@@ -293,7 +296,7 @@
 </div>
 
 <!--Delete window-->
-<div class="modal fade" th:each="deleteUser : ${users}" th:id="${'delete' + deleteUser.getId()}"
+<div class="modal fade deleteModal" th:each="deleteUser : ${users}" th:id="${'delete' + deleteUser.getId()}"
      tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -304,7 +307,7 @@
                 </button>
             </div>
             <div class="modal-body container-fluid text-center col-6">
-                <form role="form" class="form-horizontal">
+                <form role="form" class="form-horizontal" th:method="DELETE" th:action="@{/api/users/}">
                     <div class="form-group">
                         <label><strong>ID</strong>
                             <input type="text" class="form-control" th:value="${deleteUser.id}"
@@ -353,8 +356,9 @@
                 </form>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <a th:href="@{/admin/{id}/delete(id=${deleteUser.getId()})}"
-                       class="btn btn-danger"><span>Delete</span></a>
+                    <a th:value="${deleteUser.id}"
+                       th:onclick="@{deleteButton({id})(id=${deleteUser.getId()})}"
+                       class="btn btn-danger deleteButton"><span>Delete</span></a>
                 </div>
             </div>
         </div>
