@@ -15,12 +15,10 @@ import java.security.Principal;
 public class AdminController {
 
     private final UserService service;
-    private final RoleService roleService;
 
     @Autowired
-    public AdminController(UserService service, RoleService roleService) {
+    public AdminController(UserService service) {
         this.service = service;
-        this.roleService = roleService;
     }
 
     @GetMapping
@@ -28,42 +26,6 @@ public class AdminController {
                         Model model) {
         User user = service.findByEmail(principal.getName());
         model.addAttribute("user", user);
-//        model.addAttribute("users", service.findAll());
-//        model.addAttribute("roles", roleService.getAllRoles());
         return "users/admin";
     }
-
-//    @PostMapping("/new")
-//    public String create(@ModelAttribute("user") User user,
-//                         @RequestParam(value = "roles") String[] roles) {
-//        user.setRoles(roleService.getSetOfRoles(roles));
-//        service.saveUser(user);
-//        return "redirect:/admin";
-//    }
-//
-//    @GetMapping("/{id}/edit")
-//    public String edit(@ModelAttribute("user") User user,
-//                       Model model,
-//                       @PathVariable("id") Long id,
-//                       @RequestParam(value = "editRoles") String[] roles) {
-//        user.setRoles(roleService.getSetOfRoles(roles));
-//        model.addAttribute("roles", roleService.getAllRoles());
-//        model.addAttribute("user", service.findById(id));
-//        return "users/admin";
-//    }
-//
-//    @PostMapping("/{id}/edit")
-//    public String update(@ModelAttribute("user") User user,
-//                         @RequestParam(value = "roles", required = false) String[] roles) {
-//
-//        user.setRoles(roleService.getSetOfRoles(roles));
-//        service.updateUser(user);
-//        return "redirect:/admin";
-//    }
-//
-//    @GetMapping("/{id}/delete")
-//    public String delete(@PathVariable("id") Long id) {
-//        service.deleteById(id);
-//        return "redirect:/admin";
-//    }
 }

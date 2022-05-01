@@ -1,74 +1,12 @@
 
 const usersTable = document.querySelector('.user-table')
-const userPage = document.querySelector('.user-page')
 const url = 'http://localhost:8080/api/users'
 
-const fetchService = {
-    head: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Referer': null
-    },
-    // bodyAdd : async function(user) {return {'method': 'POST', 'headers': this.head, 'body': user}},
-    findAllUsers: async () => await fetch('api/users'),
-    findUserById: async (id) => await fetch(`api/users/${id}`),
-    addNewUser: async (user) => await fetch('api/users',
-        {method: 'POST', headers: fetchService.head, body: JSON.stringify(user)}),
-    updateUser: async (user, id) => await fetch(`api/users/${id}`,
-        {method: 'PUT', headers: fetchService.head, body: JSON.stringify(user)}),
-    deleteUser: async (id) => await fetch(`api/users/${id}`,
-        {method: 'DELETE', headers: fetchService.head})
+const header = {
+    'Accept': 'application/json',
+    "Content-Type": 'application/json',
+    'Referer': null
 }
-
-//заполнение модалок
-function fillModal (user, modaltype) {
-
-    document.getElementById(modaltype + "Id").value = user.id;
-    document.getElementById(modaltype + "FirstName").value = user.firstName;
-    document.getElementById(modaltype + "LastName").value = user.lastName;
-    document.getElementById(modaltype + "Age").value = user.age;
-    document.getElementById(modaltype + "Email").value = user.email;
-    document.getElementById(modaltype + "Password").value = user.password;
-    document.getElementById(modaltype + "Button").value = user.id;
-}
-//заполнение модалок
-function findUserById (id, modaltype) {
-    fetch(url+'/'+id)
-        .then(res => res.json())
-        .then(data => fillModal(data, modaltype));
-}
-
-
-
-// let allRoles = () => {
-//     let roles = []
-//     fetch('http://localhost:8080/api/roles')
-//         .then(res => res.json())
-//         .then(data => roles.push(data));
-//     roles.forEach(role => console.log(role))
-// }
-// allRoles()
-
-// user page
-// let showUserPage = (user) => {
-//     let output = '<tr>\n' +
-//         '   <td th:text="${user.getId()}"></td>\n' +
-//         '   <td th:text="${user.getFirstName()}"></td>\n' +
-//         '   <td th:text="${user.getLastName()}"></td>\n' +
-//         '   <td th:text="${user.getEmail()}"></td>\n' +
-//         '   <td th:text="${user.getAge()}"></td>\n' +
-//         '   <td th:text="${user.getRoles()}"></td>\n' +
-//         '</tr>'
-//     userPage.innerHTML = output;
-// }
-//
-// function getUserPage (id) {
-//     fetch(url+'/'+id)
-//         .then(res => res.json())
-//         .then(data => showUserPage(data));
-// }
-//
-// getUserPage(this.value);
 
 let renderUsers = (users) => {
     let output = ''
@@ -78,9 +16,6 @@ let renderUsers = (users) => {
         for (let a of user.roles) {
             roleOfUser += a.role.replace("ROLE_", "") + " "
         }
-        // TODO добавить уникальный айди к каждой кнопке id="unique"
-        // TODO почитать про addEventListener
-        // TODO как вызвать модальное окно через jQuery
         output += `<tr>
                         <th scope="row">${user.id}</th>
                         <td>${user.firstName}</td>
@@ -113,9 +48,7 @@ let renderUsers = (users) => {
 
         });
 }
-$('#deleteButton').click( function (){
-    deleteButton(this.value);
-});
+
 //вывод таблицы всех пользователей
 function getUsers () {
     fetch(url)
@@ -131,14 +64,69 @@ function clearUsers () {
     getUsers();
 }
 
+//заполнение модалок
+function fillModal (user, modaltype) {
+
+    document.getElementById(modaltype + "Id").value = user.id;
+    document.getElementById(modaltype + "FirstName").value = user.firstName;
+    document.getElementById(modaltype + "LastName").value = user.lastName;
+    document.getElementById(modaltype + "Age").value = user.age;
+    document.getElementById(modaltype + "Email").value = user.email;
+    document.getElementById(modaltype + "Password").value = user.password;
+    document.getElementById(modaltype + "Button").value = user.id;
+}
+
+function findUserById (id, modaltype) {
+    fetch(url+'/'+id)
+        .then(res => res.json())
+        .then(data => fillModal(data, modaltype));
+}
+
+function editUser() {
+    let roles = [];
+
+    let authorities = $('#editRoles').val();
+    authorities.forEach(roleId => {
+        roles.push({id: roleId, role: roleId == 1 ? "ROLE_USER" : "ROLE_ADMIN"})
+    })
+    console.log(roles);
+
+    let user = {
+        id: $("#editId").val().trim(),
+        firstName: $("#editFirstName").val().trim(),
+        lastName: $("#editLastName").val().trim(),
+        email: $("#editEmail").val().trim(),
+        age: $("#editAge").val().trim(),
+        password: $("#editPassword").val().trim(),
+        roles: roles
+    }
+    console.log(user)
+    console.log(JSON.stringify(user))
+
+    fetch(url, {
+        method:'PUT',
+        headers: header,
+        body: JSON.stringify(user)
+    })
+        .then(data => {
+
+            console.log('Success:', data);
+            clearUsers();
+            $('#userEditModal').modal('hide')
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
 function addUser () {
     let roles = [];
 
     let authorities = $('#addRole').val();
     authorities.forEach(roleId => {
         roles.push({id: roleId, role: roleId == 1 ? "ROLE_USER" : "ROLE_ADMIN"
-        //roles = allRoles(by id)
-            })})
+            })
+    })
     console.log(roles);
 
     let user = {
@@ -149,17 +137,10 @@ function addUser () {
         password: $("#addPassword").val().trim(),
         roles: roles
     }
-    console.log(user);
 
-    // TODO preventDefault - отменяет дефолтное действие при нажатии
-    // TODO
     fetch(url, {
         method:'POST',
-        headers: {
-            'Accept': 'application/json',
-            "Content-Type": 'application/json',
-            'Referer': null
-        },
+        headers: header,
         body: JSON.stringify(user)
     })
         .then(data => {
@@ -174,24 +155,10 @@ function addUser () {
 
 }
 
-
-// $('.openEditModal').click(
-//     function () {
-//         console.log('click start')
-//         $('#userEditModal').modal('show');
-//         findUserById(this.value, 'edit');
-//         console.log('click end')
-//     });
-
-
 function deleteButton (id) {
     fetch(url+'/'+id, {
         method:'DELETE',
-        headers: {
-            'Accept': 'application/json',
-            "Content-Type": 'application/json',
-            'Referer': null
-        }
+        headers: header
     })
         .then(data => {
             console.log('Success:', data);
@@ -203,23 +170,10 @@ function deleteButton (id) {
         });
 }
 
-function editUser (id) {
+$('#addUserButton').click(function () {addUser()});
 
-    fetch(url, {
-        method:'PUT',
-        headers: {
-            'Accept': 'application/json',
-            "Content-Type": 'application/json',
-            'Referer': null
-        }
-    })
-        .then(data => {
-            console.log('Success:', data);
-            $('#delete'+id).modal('hide')
-            clearUsers();
+$('#editButton').click(function () {editUser()});
 
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-}
+$('#deleteButton').click( function (){
+    deleteButton(this.value);
+});

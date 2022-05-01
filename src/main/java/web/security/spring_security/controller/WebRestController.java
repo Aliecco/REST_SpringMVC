@@ -28,11 +28,6 @@ public class WebRestController {
         return service.findAll();
     }
 
-    @GetMapping("/roles")
-    public List<Role> getAllRoles() {
-        return roleService.getAllRoles();
-    }
-
     @GetMapping("/users/{id}")
     public User getUserById(@PathVariable Long id) {
         return service.findById(id);
