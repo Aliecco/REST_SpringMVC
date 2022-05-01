@@ -209,13 +209,10 @@
 
 
 <!--Edit window-->
-<div class="modal fade" th:each="user : ${users}" th:id="${'edit' + user.getId()}"
+<div class="modal fade" id="userEditModal"
      tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <form role="form" class="form-horizontal">
-<!--              th:method="PUT"-->
-<!--              th:action="@{/api/users}" th:object="${user}"-->
-
+        <form role="form" class="form-horizontal" >
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="ModalLongTitle">Edit user</h5>
@@ -225,11 +222,17 @@
                 </div>
                 <div class="modal-body container-fluid text-center col-6">
                     <div class="row justify-content-center">
+                        <div class="form-group">
+                            <label><strong>ID</strong>
+                                <input type="text" class="form-control" id="editId"
+                                       readonly="readonly">
+                            </label>
+                        </div>
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>First name</strong>
-                                    <input type="text" name="firstName"
-                                           class="form-control" th:value="${user.firstName}"
+                                    <input type="text" name="firstName" id="editFirstName"
+                                           class="form-control"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
                             </div>
@@ -237,8 +240,8 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Last name</strong>
-                                    <input type="text" name="lastName"
-                                           class="form-control" th:value="${user.lastName}"
+                                    <input type="text" name="lastName" id="editLastName"
+                                           class="form-control"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
                             </div>
@@ -246,8 +249,8 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Age</strong>
-                                    <input type="number" name="age"
-                                           class="form-control" th:value="${user.age}"
+                                    <input type="number" name="age" id="editAge"
+                                           class="form-control"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
                             </div>
@@ -255,8 +258,8 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Email</strong>
-                                    <input type="text" name="email"
-                                           class="form-control" th:value="${user.email}"
+                                    <input type="text" name="email" id="editEmail"
+                                           class="form-control"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
                             </div>
@@ -264,7 +267,7 @@
                         <div class="row">
                             <div class="input-group input-group-sm mb-3">
                                 <label><strong>Password</strong>
-                                    <input type="password" name="password"
+                                    <input type="password" name="password" id="editPassword"
                                            class="form-control"
                                            aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                 </label>
@@ -273,13 +276,10 @@
                         <div class="d-flex flex-row bd-highlight">
                             <div class="form-group">
                                 <label><strong>Roles</strong></label>
-                                <select class="custom-select bd-primary"
+                                <select class="custom-select bd-primary" id="editRoles"
                                         size="2" name="roles" multiple="multiple">
-                                    <option th:each="role : ${roles}"
-                                            th:value="${role.getRole}"
-                                            th:text="${#strings.replace(role.getRole(), 'ROLE_', '')}"
-                                            th:selected="${role.getRole()} == USER">
-                                    </option>
+                                    <option value="1">USER</option>
+                                    <option value="2">ADMIN</option>
                                 </select>
                             </div>
                         </div>
@@ -287,8 +287,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary"
-                            th:onclick="@{console.log({user})" >Save changes</button>
+                    <button type="submit" class="btn btn-primary" id="editButton">Save changes</button>
                 </div>
             </div>
         </form>
@@ -296,7 +295,7 @@
 </div>
 
 <!--Delete window-->
-<div class="modal fade deleteModal" th:each="deleteUser : ${users}" th:id="${'delete' + deleteUser.getId()}"
+<div class="modal fade deleteModal" id="userDeleteModal"
      tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -307,48 +306,52 @@
                 </button>
             </div>
             <div class="modal-body container-fluid text-center col-6">
-                <form role="form" class="form-horizontal" th:method="DELETE" th:action="@{/api/users/}">
+                <form role="form" class="form-horizontal">
                     <div class="form-group">
                         <label><strong>ID</strong>
-                            <input type="text" class="form-control" th:value="${deleteUser.id}"
+                            <input type="text" class="form-control" id="deleteId"
                                    readonly="readonly">
                         </label>
                     </div>
                     <div class="form-group">
                         <label><strong>First name</strong>
-                            <input type="text" class="form-control" th:value="${deleteUser.firstName}"
+                            <input type="text" class="form-control" id="deleteFirstName"
                                    readonly="readonly">
                         </label>
                     </div>
                     <div class="form-group">
                         <label><strong>Last name</strong>
-                            <input type="text" class="form-control" th:value="${deleteUser.lastName}"
+                            <input type="text" class="form-control" id="deleteLastName"
                                    readonly="readonly">
                         </label>
                     </div>
                     <div class="form-group">
                         <label><strong>Age</strong>
-                            <input type="text" class="form-control" th:value="${deleteUser.age}"
+                            <input type="text" class="form-control" id="deleteAge"
                                    readonly="readonly">
                         </label>
                     </div>
                     <div class="form-group">
                         <label><strong>Email</strong>
-                            <input type="text" class="form-control" th:value="${deleteUser.email}"
+                            <input type="text" class="form-control" id="deleteEmail"
                                    readonly="readonly">
                         </label>
+                    </div>
+                    <div class="row" hidden=true>
+                        <div class="input-group input-group-sm mb-3">
+                            <label><strong>Password</strong>
+                                <input type="password" name="password" id="deletePassword"
+                                       class="form-control" readonly="readonly">
+                            </label>
+                        </div>
                     </div>
                     <div class="d-flex flex-row bd-highlight">
                         <div class="form-group">
                             <label><strong>Role:</strong>
                                 <select class="custom-select bd-primary" size="2" multiple name="roles"
-                                        style="width: 210px">
-                                    <option th:each="role : ${roles}"
-                                            th:value="${role.getRole}"
-                                            th:text="${#strings.replace(role.getRole(), 'ROLE_', '')}"
-                                            th:selected="${role.getRole()} == USER"
-                                            readonly="readonly">
-                                    </option>
+                                        style="width: 210px" readonly="readonly">
+                                    <option value="1">USER</option>
+                                    <option value="2">ADMIN</option>
                                 </select>
                             </label>
                         </div>
@@ -356,9 +359,7 @@
                 </form>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <a th:value="${deleteUser.id}"
-                       th:onclick="@{deleteButton({id})(id=${deleteUser.getId()})}"
-                       class="btn btn-danger deleteButton"><span>Delete</span></a>
+                    <button type="submit" class="btn btn-danger" style="color:white" id="deleteButton">Delete</button>
                 </div>
             </div>
         </div>

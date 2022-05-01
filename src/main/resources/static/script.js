@@ -1,24 +1,82 @@
 
-const usersTable = document.querySelector('.user-table');
-const url = 'http://localhost:8080/api/users';
+const usersTable = document.querySelector('.user-table')
+const userPage = document.querySelector('.user-page')
+const url = 'http://localhost:8080/api/users'
 
-
-let allRoles = () => {
-    let roles = [];
-    fetch('http://localhost:8080/api/roles')
-        .then(res => res.json())
-        .then(data => roles.push(data));
-    roles.forEach(role => console.log(role));
+const fetchService = {
+    head: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Referer': null
+    },
+    // bodyAdd : async function(user) {return {'method': 'POST', 'headers': this.head, 'body': user}},
+    findAllUsers: async () => await fetch('api/users'),
+    findUserById: async (id) => await fetch(`api/users/${id}`),
+    addNewUser: async (user) => await fetch('api/users',
+        {method: 'POST', headers: fetchService.head, body: JSON.stringify(user)}),
+    updateUser: async (user, id) => await fetch(`api/users/${id}`,
+        {method: 'PUT', headers: fetchService.head, body: JSON.stringify(user)}),
+    deleteUser: async (id) => await fetch(`api/users/${id}`,
+        {method: 'DELETE', headers: fetchService.head})
 }
-allRoles();
+
+//заполнение модалок
+function fillModal (user, modaltype) {
+
+    document.getElementById(modaltype + "Id").value = user.id;
+    document.getElementById(modaltype + "FirstName").value = user.firstName;
+    document.getElementById(modaltype + "LastName").value = user.lastName;
+    document.getElementById(modaltype + "Age").value = user.age;
+    document.getElementById(modaltype + "Email").value = user.email;
+    document.getElementById(modaltype + "Password").value = user.password;
+    document.getElementById(modaltype + "Button").value = user.id;
+}
+//заполнение модалок
+function findUserById (id, modaltype) {
+    fetch(url+'/'+id)
+        .then(res => res.json())
+        .then(data => fillModal(data, modaltype));
+}
+
+
+
+// let allRoles = () => {
+//     let roles = []
+//     fetch('http://localhost:8080/api/roles')
+//         .then(res => res.json())
+//         .then(data => roles.push(data));
+//     roles.forEach(role => console.log(role))
+// }
+// allRoles()
+
+// user page
+// let showUserPage = (user) => {
+//     let output = '<tr>\n' +
+//         '   <td th:text="${user.getId()}"></td>\n' +
+//         '   <td th:text="${user.getFirstName()}"></td>\n' +
+//         '   <td th:text="${user.getLastName()}"></td>\n' +
+//         '   <td th:text="${user.getEmail()}"></td>\n' +
+//         '   <td th:text="${user.getAge()}"></td>\n' +
+//         '   <td th:text="${user.getRoles()}"></td>\n' +
+//         '</tr>'
+//     userPage.innerHTML = output;
+// }
+//
+// function getUserPage (id) {
+//     fetch(url+'/'+id)
+//         .then(res => res.json())
+//         .then(data => showUserPage(data));
+// }
+//
+// getUserPage(this.value);
 
 let renderUsers = (users) => {
-    let output = '';
+    let output = ''
     users.forEach(user => {
 
-        let roleOfUser = '';
+        let roleOfUser = ''
         for (let a of user.roles) {
-            roleOfUser += a.role.replace("ROLE_", "") + " ";
+            roleOfUser += a.role.replace("ROLE_", "") + " "
         }
         // TODO добавить уникальный айди к каждой кнопке id="unique"
         // TODO почитать про addEventListener
@@ -31,24 +89,38 @@ let renderUsers = (users) => {
                         <td>${user.email}</td>
                         <td>${roleOfUser}</td>
                         <td>
-                            <button onclick="$('${'#edit'+user.id}').modal('show')" type="button" 
-                            class="btn btn-info" data-toggle="modal" value="${user.id}">Edit</button>
+                            <button type="button" class="btn btn-info openEditModal" 
+                                data-toggle="modal" value="${user.id}">Edit</button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger"
-                                 data-toggle="modal" onclick="$('${'#delete'+user.id}').modal('show')" 
-                                 value="${user.id}">Delete</button>
+                            <button type="button" class="btn btn-danger openDeleteModal"
+                                data-toggle="modal" value="${user.id}">Delete</button>
                         </td>
                     </tr>`;
     });
     usersTable.innerHTML = output;
+    $('.openEditModal').click(
+        function () {
+            console.log('click start')
+            $('#userEditModal').modal('show');
+            findUserById(this.value, 'edit');
+            console.log('click end')
+        });
+    $('.openDeleteModal').click(
+        function () {
+            $('#userDeleteModal').modal('show');
+            findUserById(this.value, 'delete');
+
+        });
 }
+$('#deleteButton').click( function (){
+    deleteButton(this.value);
+});
 //вывод таблицы всех пользователей
 function getUsers () {
     fetch(url)
         .then(res => res.json())
         .then(data => renderUsers(data));
-    console.log('getUsers works')
 }
 
 getUsers();
@@ -56,12 +128,10 @@ getUsers();
 function clearUsers () {
     $('.user-table').html("");
     // usersTable.
-    console.log('CLEAR TABLE')
     getUsers();
 }
 
 function addUser () {
-    console.log('addUser started')
     let roles = [];
 
     let authorities = $('#addRole').val();
@@ -95,6 +165,7 @@ function addUser () {
         .then(data => {
             console.log('Success:', data);
             clearUsers();
+            document.getElementById('nav-users-tab').click();
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -102,6 +173,16 @@ function addUser () {
 
 
 }
+
+
+// $('.openEditModal').click(
+//     function () {
+//         console.log('click start')
+//         $('#userEditModal').modal('show');
+//         findUserById(this.value, 'edit');
+//         console.log('click end')
+//     });
+
 
 function deleteButton (id) {
     fetch(url+'/'+id, {
@@ -114,18 +195,17 @@ function deleteButton (id) {
     })
         .then(data => {
             console.log('Success:', data);
-            $('#delete'+id).modal('hide')
+            $('#userDeleteModal').modal('hide')
             clearUsers();
-
         })
         .catch((error) => {
             console.error('Error:', error);
         });
-
 }
+
 function editUser (id) {
 
-    fetch(url+id, {
+    fetch(url, {
         method:'PUT',
         headers: {
             'Accept': 'application/json',
