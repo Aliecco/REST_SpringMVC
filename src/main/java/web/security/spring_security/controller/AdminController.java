@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import web.security.spring_security.model.User;
-import web.security.spring_security.service.RoleService;
 import web.security.spring_security.service.UserService;
 
 import java.security.Principal;
