@@ -16,13 +16,13 @@ let renderUsers = (users) => {
         for (let a of user.roles) {
             roleOfUser += a.role.replace("ROLE_", "") + " "
         }
-        output += `<tr>
+        output += `<tr id="${user.id}">
                         <th scope="row">${user.id}</th>
-                        <td>${user.firstName}</td>
-                        <td>${user.lastName}</td>
-                        <td>${user.age}</td>
-                        <td>${user.email}</td>
-                        <td>${roleOfUser}</td>
+                        <td class="firstNameRow">${user.firstName}</td>
+                        <td class="lastNameRow">${user.lastName}</td>
+                        <td class="ageRow">${user.age}</td>
+                        <td class="emailRow">${user.email}</td>
+                        <td class="roleRow">${roleOfUser}</td>
                         <td>
                             <button type="button" class="btn btn-info openEditModal" 
                                 data-toggle="modal" value="${user.id}">Edit</button>
@@ -58,6 +58,48 @@ function getUsers () {
 
 getUsers();
 
+function updateRow(user) {
+    let roleOfUser = ''
+    for (let a of user.roles) {
+        roleOfUser += a.role.replace("ROLE_", "") + " "
+    }
+    $("tr#"+user.id+" .firstNameRow").text(user.firstName);
+    $("tr#"+user.id+" .lastNameRow").text(user.lastName);
+    $("tr#"+user.id+" .ageRow").text(user.age);
+    $("tr#"+user.id+" .emailRow").text(user.email);
+    $("tr#"+user.id+" .roleRow").text(roleOfUser);
+}
+
+function deleteRow(id) {
+    $('tr#'+id).html("");
+}
+
+// function addRow(user) {
+//     let output;
+//     let roleOfUser = '';
+//     for (let a of user.roles) {
+//         roleOfUser += a.role.replace("ROLE_", "") + " "
+//     }
+//     output += `<tr id="${user.id}">
+//                         <th scope="row">${user.id}</th>
+//                         <td class="firstNameRow">${user.firstName}</td>
+//                         <td class="lastNameRow">${user.lastName}</td>
+//                         <td class="ageRow">${user.age}</td>
+//                         <td class="emailRow">${user.email}</td>
+//                         <td class="roleRow">${roleOfUser}</td>
+//                         <td>
+//                             <button type="button" class="btn btn-info openEditModal"
+//                                 data-toggle="modal" value="${user.id}">Edit</button>
+//                         </td>
+//                         <td>
+//                             <button type="button" class="btn btn-danger openDeleteModal"
+//                                 data-toggle="modal" value="${user.id}">Delete</button>
+//                         </td>
+//                     </tr>`;
+//     usersTable.append(output);
+//
+// }
+
 function clearUsers () {
     $('.user-table').html("");
     // usersTable.
@@ -67,12 +109,13 @@ function clearUsers () {
 //заполнение модалок
 function fillModal (user, modaltype) {
 
+    //TODO switch to jQuery
     document.getElementById(modaltype + "Id").value = user.id;
     document.getElementById(modaltype + "FirstName").value = user.firstName;
     document.getElementById(modaltype + "LastName").value = user.lastName;
     document.getElementById(modaltype + "Age").value = user.age;
     document.getElementById(modaltype + "Email").value = user.email;
-    document.getElementById(modaltype + "Password").value = user.password;
+    // document.getElementById(modaltype + "Password").value = user.password;
     document.getElementById(modaltype + "Button").value = user.id;
 }
 
@@ -100,8 +143,6 @@ function editUser() {
         password: $("#editPassword").val().trim(),
         roles: roles
     }
-    console.log(user)
-    console.log(JSON.stringify(user))
 
     fetch(url, {
         method:'PUT',
@@ -111,7 +152,7 @@ function editUser() {
         .then(data => {
 
             console.log('Success:', data);
-            clearUsers();
+            updateRow(user);
             $('#userEditModal').modal('hide')
         })
         .catch((error) => {
@@ -163,7 +204,7 @@ function deleteButton (id) {
         .then(data => {
             console.log('Success:', data);
             $('#userDeleteModal').modal('hide')
-            clearUsers();
+            deleteRow(id);
         })
         .catch((error) => {
             console.error('Error:', error);
