@@ -59,9 +59,9 @@ public class DataConfig {
     public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(env.getProperty("spring.datasource.driver"));
-        dataSource.setUrl(env.getProperty("spring.datasource.url"));
-        dataSource.setUsername(env.getProperty("spring.datasource.username"));
-        dataSource.setPassword(env.getProperty("spring.datasource.password"));
+        dataSource.setUrl("jdbc:mysql://" + System.getenv("MYSQL_HOST") + "/" + System.getenv("MYSQL_DB"));
+        dataSource.setUsername(System.getenv("MYSQL_USER"));
+        dataSource.setPassword(System.getenv("MYSQL_PASSWORD"));
         return dataSource;
     }
 }
